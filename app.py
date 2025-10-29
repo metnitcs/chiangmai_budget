@@ -54,6 +54,31 @@ BASE_CSS = """
   color: #1f2937 !important;
 }
 
+/* Fix selectbox text */
+.stSelectbox div[data-baseweb="select"] > div {
+  color: #1f2937 !important;
+}
+
+/* Fix success/error messages */
+.stAlert > div {
+  color: #1f2937 !important;
+}
+
+.stSuccess > div {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.stError > div {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+/* Fix toggle text */
+.stCheckbox > label > div {
+  color: #1f2937 !important;
+}
+
 .stTabs [data-baseweb="tab-list"] { gap: .5rem; }
 .stTabs [data-baseweb="tab"] { 
   border-radius: 25px; 
@@ -69,6 +94,25 @@ BASE_CSS = """
 
 /* Headers */
 h1, h2, h3, h4, h5, h6 {
+  color: #1f2937 !important;
+}
+
+/* Labels and form elements */
+.stSelectbox > label, .stDateInput > label, .stSlider > label {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+/* Dropdown options */
+[data-baseweb="popover"] {
+  background-color: #ffffff !important;
+}
+
+[data-baseweb="menu"] {
+  background-color: #ffffff !important;
+}
+
+[data-baseweb="menu"] li {
   color: #1f2937 !important;
 }
 </style>
