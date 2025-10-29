@@ -6,7 +6,7 @@ import plotly.express as px
 from datetime import datetime, date
 from pathlib import Path
 
-st.set_page_config(page_title="ระบบติดตามงบประมาณ (สไตล์ Lamphun)", layout="wide")
+st.set_page_config(page_title="ระบบติดตามงบประมาณ", layout="wide")
 
 # THEME
 BASE_CSS = """
@@ -15,7 +15,7 @@ BASE_CSS = """
 .block-container { padding-top: 0.5rem; }
 .hero {
   background: linear-gradient(90deg, var(--primary), #2dd4bf);
-  color: white; padding: 22px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  color: white; padding: 22px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
 }
 .hero h1 { margin: 0; font-size: 1.6rem; }
 .hero p { margin: 6px 0 0; opacity: .95; }
@@ -33,9 +33,11 @@ st.markdown(BASE_CSS, unsafe_allow_html=True)
 st.markdown("""
 <div class="hero">
   <h1>ระบบติดตามงบประมาณ</h1>
-  <p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส</p>
+  <p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน</p>
 </div>
 """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # HELPERS
 DATA_PATH = Path(__file__).with_name("data.xlsx")
@@ -82,6 +84,8 @@ try:
 except Exception as e:
     st.error(f"อ่านไฟล์ไม่สำเร็จ: {e}")
     st.stop()
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 default_cols = {
     "date": "contract_date",
@@ -141,12 +145,21 @@ f = df[(df["_year_be"] == sel_year)]
 f = f[(f["_date"].dt.date >= date_from) & (f["_date"].dt.date <= date_to)]
 
 # KPI
-k1, k2, k3, k4 = st.columns(4)
+k1, k2, k3, k4, k5, k6 = st.columns(6)
 k1.markdown(f'<div class="kpi"><div class="label">จำนวนรายการ</div><div class="value">{len(f):,}</div></div>', unsafe_allow_html=True)
-k2.markdown(f'<div class="kpi"><div class="label">มูลค่ารวม (บ.)</div><div class="value">{f["_value"].sum():,.2f}</div></div>', unsafe_allow_html=True)
-k3.markdown(f'<div class="kpi"><div class="label">ผู้รับจ้าง (ไม่ซ้ำ)</div><div class="value">{f[vendor_col].nunique():,}</div></div>', unsafe_allow_html=True)
+k2.markdown(f'<div class="kpi"><div class="label">ผู้รับจ้าง (ไม่ซ้ำ)</div><div class="value">{f[vendor_col].nunique():,}</div></div>', unsafe_allow_html=True)
+
+# Budget comparison
+total_budget = f["_money"].sum()
+total_contract = f["_value"].sum()
+budget_usage = (total_contract / total_budget * 100) if total_budget > 0 else 0
+
+k3.markdown(f'<div class="kpi"><div class="label">งบประมาณรวม (บ.)</div><div class="value">{total_budget:,.2f}</div></div>', unsafe_allow_html=True)
+k4.markdown(f'<div class="kpi"><div class="label">มูลค่าสัญญา (บ.)</div><div class="value">{total_contract:,.2f}</div></div>', unsafe_allow_html=True)
+k5.markdown(f'<div class="kpi"><div class="label">% งบที่ใช้ไป</div><div class="value">{budget_usage:.1f}%</div></div>', unsafe_allow_html=True)
+
 monthly_sum = f.groupby(f["_date"].dt.to_period("M"))["_value"].sum()
-k4.markdown(f'<div class="kpi"><div class="label">เฉลี่ยต่อเดือน (บ.)</div><div class="value">{(monthly_sum.mean() if len(monthly_sum)>0 else 0):,.2f}</div></div>', unsafe_allow_html=True)
+k6.markdown(f'<div class="kpi"><div class="label">เฉลี่ยต่อเดือน (บ.)</div><div class="value">{(monthly_sum.mean() if len(monthly_sum)>0 else 0):,.2f}</div></div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
