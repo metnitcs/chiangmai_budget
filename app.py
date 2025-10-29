@@ -1,4 +1,3 @@
-
 import os
 import pandas as pd
 import numpy as np
@@ -9,46 +8,57 @@ from datetime import datetime, date
 st.set_page_config(page_title="ระบบติดตามงบประมาณ (สไตล์ Lamphun)", layout="wide")
 
 # THEME
-PRIMARY = "#1f9d55"
-ACCENT = "#0ea5e9"
-DARK_BG = "#0f1116"
-DARK_TEXT = "#e5e7eb"
-
 with st.sidebar:
     theme_mode = st.radio("ธีมเว็บไซต์", ["ขาว (Light)", "ดำ (Dark)"], index=0)
 
-BASE_CSS = f"""
+BASE_CSS = """
 <style>
-:root {{ --primary: {PRIMARY}; --accent: {ACCENT}; }}
-.block-container {{ padding-top: 0.5rem; }}
-.hero {{ background: linear-gradient(90deg, var(--primary), #2dd4bf); color: white; padding: 22px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08);}}
-.hero h1 {{ margin: 0; font-size: 1.6rem; }}
-.hero p {{ margin: 6px 0 0; opacity: .95; }}
-.kpi {{ background: #ffffff; border-radius: 16px; padding: 18px; border: 1px solid #f0f0f0; box-shadow: 0 4px 16px rgba(0,0,0,.04);}}
-.kpi .label {{ color: #6b7280; font-size: .9rem; }}
-.kpi .value {{ color: var(--primary); font-weight: 700; font-size: 1.25rem; }}
-body.dark, [data-testid="stAppViewContainer"].dark {{ background: {DARK_BG}; color: {DARK_TEXT}; }}
-.dark .hero {{ background: linear-gradient(90deg, #065f46, #0e7490); }}
-.dark .kpi {{ background: #111827; border-color: #1f2937; }}
-.dark .kpi .label {{ color: #9ca3af; }}
-.dark .kpi .value {{ color: #34d399; }}
-.stTabs [data-baseweb="tab-list"] {{ gap: .25rem; }}
-.stTabs [data-baseweb="tab"] {{ border-radius: 999px; background: rgba(0,0,0,.04); }}
-.dark .stTabs [data-baseweb="tab"] {{ background: rgba(255,255,255,.06); }}
+:root { --primary: #1f9d55; --accent: #0ea5e9; }
+.block-container { padding-top: 0.5rem; }
+.hero {
+  background: linear-gradient(90deg, var(--primary), #2dd4bf);
+  color: white; padding: 22px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+.hero h1 { margin: 0; font-size: 1.6rem; }
+.hero p { margin: 6px 0 0; opacity: .95; }
+.kpi { background: #ffffff; border-radius: 16px; padding: 18px; border: 1px solid #f0f0f0; box-shadow: 0 4px 16px rgba(0,0,0,.04); }
+.kpi .label { color: #6b7280; font-size: .9rem; }
+.kpi .value { color: var(--primary); font-weight: 700; font-size: 1.25rem; }
+body.dark, [data-testid="stAppViewContainer"].dark { background: #0f1116; color: #e5e7eb; }
+.dark .hero { background: linear-gradient(90deg, #065f46, #0e7490); }
+.dark .kpi { background: #111827; border-color: #1f2937; }
+.dark .kpi .label { color: #9ca3af; }
+.dark .kpi .value { color: #34d399; }
+.stTabs [data-baseweb="tab-list"] { gap: .25rem; }
+.stTabs [data-baseweb="tab"] { border-radius: 999px; background: rgba(0,0,0,.04); }
+.dark .stTabs [data-baseweb="tab"] { background: rgba(255,255,255,.06); }
 </style>
 """
 st.markdown(BASE_CSS, unsafe_allow_html=True)
+
 if "Dark" in theme_mode:
-   st.markdown(
-    '<script>document.querySelector("[data-testid=\\"stAppViewContainer\\"]").classList.add("dark")</script>',unsafe_allow_html=True)
-    
-st.markdown('<div class="hero"><h1>ระบบติดตามงบประมาณ</h1><p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส</p></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <script>
+    const el = document.querySelector('[data-testid="stAppViewContainer"]');
+    if (el) { el.classList.add('dark'); }
+    </script>
+    """, unsafe_allow_html=True)
 
+st.markdown("""
+<div class="hero">
+  <h1>ระบบติดตามงบประมาณ</h1>
+  <p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส</p>
+</div>
+""", unsafe_allow_html=True)
+
+# HELPERS
 DATA_PATH = "/mnt/data/รายการจัดซื้อจัดจ้างองค์การบริหารส่วนจังหวัดเชียงใหม่2558-2568.xlsx"
-TH_MONTHS = {{"ม.ค.":1,"ก.พ.":2,"มี.ค.":3,"เม.ย.":4,"พ.ค.":5,"มิ.ย.":6,"ก.ค.":7,"ส.ค.":8,"ก.ย.":9,"ต.ค.":10,"พ.ย.":11,"ธ.ค.":12,
-              "มกราคม":1,"กุมภาพันธ์":2,"มีนาคม":3,"เมษายน":4,"พฤษภาคม":5,"มิถุนายน":6,
-              "กรกฎาคม":7,"สิงหาคม":8,"กันยายน":9,"ตุลาคม":10,"พฤศจิกายน":11,"ธันวาคม":12}}
-
+TH_MONTHS = {
+    "ม.ค.":1,"ก.พ.":2,"มี.ค.":3,"เม.ย.":4,"พ.ค.":5,"มิ.ย.":6,
+    "ก.ค.":7,"ส.ค.":8,"ก.ย.":9,"ต.ค.":10,"พ.ย.":11,"ธ.ค.":12,
+    "มกราคม":1,"กุมภาพันธ์":2,"มีนาคม":3,"เมษายน":4,"พฤษภาคม":5,"มิถุนายน":6,
+    "กรกฎาคม":7,"สิงหาคม":8,"กันยายน":9,"ตุลาคม":10,"พฤศจิกายน":11,"ธันวาคม":12
+}
 def parse_thai_date(s):
     if pd.isna(s): return pd.NaT
     if isinstance(s, (pd.Timestamp, datetime, date)): return pd.to_datetime(s, errors="coerce")
@@ -75,7 +85,7 @@ def clean_num(x):
 
 def to_be(ce): return ce + 543
 
-# LOAD
+# LOAD FIXED FILE
 try:
     xls = pd.ExcelFile(DATA_PATH)
     df = pd.read_excel(xls, sheet_name=xls.sheet_names[0])
@@ -84,13 +94,13 @@ except Exception as e:
     st.error(f"อ่านไฟล์ไม่สำเร็จ: {e}")
     st.stop()
 
-default_cols = {{
+default_cols = {
     "date": "transaction_date",
     "type": "project_type_name",
     "value": "contract_price_agree",
     "vendor": "winner_name",
     "money": "project_money",
-}}
+}
 c1, c2, c3, c4, c5 = st.columns(5)
 date_col = c1.selectbox("วันที่ประกาศ (ใช้กรอง)", df.columns.tolist(),
                         index=df.columns.get_loc(default_cols["date"]) if default_cols["date"] in df.columns else 0)
@@ -112,9 +122,10 @@ if df["_date"].notna().sum() == 0:
     st.error("ไม่พบวันที่ที่ parse ได้จากคอลัมน์ที่เลือก")
     st.stop()
 
-# YEAR FIRST
+# YEAR FIRST → DATE FILTER
 st.markdown("### เลือกปีงบประมาณ/ปฏิทิน ก่อน แล้วค่อยกรองช่วงวัน")
 fy_toggle = st.toggle("ใช้ปีงบประมาณไทย (ต.ค. ปีก่อน → ก.ย. ปีที่เลือก)", value=True)
+
 if fy_toggle:
     df["_year_be"] = np.where(df["_month"] >= 10, to_be(df["_year_ce"] + 1), to_be(df["_year_ce"]))
 else:
@@ -173,7 +184,12 @@ with tab2:
     st.plotly_chart(fig_bar, use_container_width=True)
 
 with tab3:
-    type_tbl = f.groupby(type_col).agg(จำนวน=("project_id","count"), มูลค่ารวม=("_value","sum")).reset_index().sort_values("มูลค่ารวม", ascending=False)
+    # Count by project_id if available, else by row index
+    count_col = "project_id" if "project_id" in f.columns else None
+    if count_col is None:
+        f = f.reset_index()
+        count_col = "index"
+    type_tbl = f.groupby(type_col).agg(จำนวน=(count_col,"count"), มูลค่ารวม=("_value","sum")).reset_index().sort_values("มูลค่ารวม", ascending=False)
     tot = type_tbl["มูลค่ารวม"].sum() or 1.0
     type_tbl["% ส่วนแบ่ง"] = (type_tbl["มูลค่ารวม"]/tot*100).round(2)
     st.dataframe(type_tbl, use_container_width=True)
