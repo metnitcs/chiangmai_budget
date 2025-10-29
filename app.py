@@ -8,59 +8,22 @@ from pathlib import Path
 
 st.set_page_config(page_title="ระบบติดตามงบประมาณ ", layout="wide")
 
-# BRIGHT THEME
+# CLEAN THEME
 BASE_CSS = """
 <style>
-:root { --primary: #ff6b35; --secondary: #f7931e; --accent: #00d4aa; --purple: #8b5cf6; }
-
-/* FORCE EVERYTHING TO BE VISIBLE */
-* {
-  color: #1f2937 !important;
-}
-
-.stApp {
-  background-color: #ffffff !important;
-}
-
-[data-testid="stAppViewContainer"] {
-  background-color: #ffffff !important;
-}
-
-.main .block-container {
-  background-color: #ffffff !important;
-}
-
+:root { --primary: #1f9d55; --accent: #0ea5e9; }
 .block-container { padding-top: 0.5rem; }
 .hero {
-  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-  color: white; padding: 24px; border-radius: 20px; box-shadow: 0 12px 32px rgba(255,107,53,.2);
+  background: linear-gradient(90deg, var(--primary), #2dd4bf);
+  color: white; padding: 22px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
 }
-.hero h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: white !important; }
-.hero p { margin: 8px 0 0; opacity: .95; font-size: 1.05rem; color: white !important; }
-
-.kpi { 
-  background: linear-gradient(145deg, #ffffff, #f8fafc); 
-  border-radius: 20px; padding: 20px; 
-  border: 2px solid #e0f2fe; 
-  box-shadow: 0 8px 25px rgba(0,212,170,.1);
-  transition: transform 0.2s ease;
-}
-.kpi:hover { transform: translateY(-2px); }
-.kpi .label { color: #475569 !important; font-size: .95rem; font-weight: 600; }
-.kpi .value { color: var(--primary) !important; font-weight: 800; font-size: 1.4rem; }
-
-.stTabs [data-baseweb="tab-list"] { gap: .5rem; }
-.stTabs [data-baseweb="tab"] { 
-  border-radius: 25px; 
-  background: linear-gradient(145deg, #f1f5f9, #e2e8f0) !important;
-  border: 2px solid transparent;
-  font-weight: 600;
-  color: #1f2937 !important;
-}
-.stTabs [data-baseweb="tab"]:hover { 
-  background: linear-gradient(145deg, var(--accent), var(--purple)) !important;
-  color: white !important;
-}
+.hero h1 { margin: 0; font-size: 1.6rem; }
+.hero p { margin: 6px 0 0; opacity: .95; }
+.kpi { background: #ffffff; border-radius: 16px; padding: 18px; border: 1px solid #f0f0f0; box-shadow: 0 4px 16px rgba(0,0,0,.04); }
+.kpi .label { color: #6b7280; font-size: .9rem; }
+.kpi .value { color: var(--primary); font-weight: 700; font-size: 1.25rem; }
+.stTabs [data-baseweb="tab-list"] { gap: .25rem; }
+.stTabs [data-baseweb="tab"] { border-radius: 999px; background: rgba(0,0,0,.04); }
 </style>
 """
 st.markdown(BASE_CSS, unsafe_allow_html=True)
@@ -68,7 +31,7 @@ st.markdown(BASE_CSS, unsafe_allow_html=True)
 st.markdown("""
 <div class="hero">
   <h1>ระบบติดตามงบประมาณ</h1>
-  <p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน</p>
+  <p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -110,9 +73,9 @@ def to_be(ce): return ce + 543
 try:
     xls = pd.ExcelFile(DATA_PATH)
     df = pd.read_excel(xls, sheet_name=xls.sheet_names[0])
-    st.markdown(f"<div style='background: #d1fae5; color: #065f46; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;'>📄 โหลดข้อมูลจากไฟล์บนเซิร์ฟเวอร์ • แถว {len(df):,} • คอลัมน์ {len(df.columns)}</div>", unsafe_allow_html=True)
+    st.success(f"📄 โหลดข้อมูลจากไฟล์บนเซิร์ฟเวอร์ • แถว {len(df):,} • คอลัมน์ {len(df.columns)}")
 except Exception as e:
-    st.markdown(f"<div style='background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;'>อ่านไฟล์ไม่สำเร็จ: {e}</div>", unsafe_allow_html=True)
+    st.error(f"อ่านไฟล์ไม่สำเร็จ: {e}")
     st.stop()
 
 default_cols = {
@@ -140,11 +103,11 @@ df["_money"] = df[money_col].apply(clean_num)
 df["_year_ce"] = df["_date"].dt.year
 df["_month"] = df["_date"].dt.month
 if df["_date"].notna().sum() == 0:
-    st.markdown("<div style='background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;'>ไม่พบวันที่ที่ parse ได้จากคอลัมน์ที่เลือก</div>", unsafe_allow_html=True)
+    st.error("ไม่พบวันที่ที่ parse ได้จากคอลัมน์ที่เลือก")
     st.stop()
 
 # YEAR FIRST → DATE FILTER
-st.markdown("<h3 style='color: #1f2937 !important;'>📅 เลือกปีงบประมาณ/ปฏิทิน ก่อน แล้วค่อยกรองช่วงวัน</h3>", unsafe_allow_html=True)
+st.markdown("### เลือกปีงบประมาณ/ปฏิทิน ก่อน แล้วค่อยกรองช่วงวัน")
 fy_toggle = st.toggle("ใช้ปีงบประมาณไทย (ต.ค. ปีก่อน → ก.ย. ปีที่เลือก)", value=True)
 
 if fy_toggle:
