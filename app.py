@@ -94,7 +94,7 @@ default_cols = {
     "vendor": "winner_name",
     "money": "project_money",
 }
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4 = st.columns(4)
 date_col = c1.selectbox("วันที่ประกาศ (ใช้กรอง)", df.columns.tolist(),
                         index=df.columns.get_loc(default_cols["date"]) if default_cols["date"] in df.columns else 0)
 type_col = c2.selectbox("ประเภทงาน", df.columns.tolist(),
@@ -103,8 +103,9 @@ value_col = c3.selectbox("มูลค่าตามสัญญา", df.column
                          index=df.columns.get_loc(default_cols["value"]) if default_cols["value"] in df.columns else 0)
 vendor_col = c4.selectbox("ผู้รับจ้าง", df.columns.tolist(),
                           index=df.columns.get_loc(default_cols["vendor"]) if default_cols["vendor"] in df.columns else 0)
-money_col = c5.selectbox("งบ/วงเงินโครงการ (ใช้สรุปต่อปี)", df.columns.tolist(),
-                         index=df.columns.get_loc(default_cols["money"]) if default_cols["money"] in df.columns else 0)
+
+# Fixed money column
+money_col = default_cols["money"]
 
 df["_date"] = pd.to_datetime(df[date_col].apply(parse_thai_date), errors="coerce")
 df["_value"] = df[value_col].apply(clean_num)
