@@ -9,9 +9,6 @@ from pathlib import Path
 st.set_page_config(page_title="ระบบติดตามงบประมาณ (สไตล์ Lamphun)", layout="wide")
 
 # THEME
-with st.sidebar:
-    theme_mode = st.radio("ธีมเว็บไซต์", ["ขาว (Light)", "ดำ (Dark)"], index=0)
-
 BASE_CSS = """
 <style>
 :root { --primary: #1f9d55; --accent: #0ea5e9; }
@@ -25,25 +22,13 @@ BASE_CSS = """
 .kpi { background: #ffffff; border-radius: 16px; padding: 18px; border: 1px solid #f0f0f0; box-shadow: 0 4px 16px rgba(0,0,0,.04); }
 .kpi .label { color: #6b7280; font-size: .9rem; }
 .kpi .value { color: var(--primary); font-weight: 700; font-size: 1.25rem; }
-body.dark, [data-testid="stAppViewContainer"].dark { background: #0f1116; color: #e5e7eb; }
-.dark .hero { background: linear-gradient(90deg, #065f46, #0e7490); }
-.dark .kpi { background: #111827; border-color: #1f2937; }
-.dark .kpi .label { color: #9ca3af; }
-.dark .kpi .value { color: #34d399; }
 .stTabs [data-baseweb="tab-list"] { gap: .25rem; }
 .stTabs [data-baseweb="tab"] { border-radius: 999px; background: rgba(0,0,0,.04); }
-.dark .stTabs [data-baseweb="tab"] { background: rgba(255,255,255,.06); }
+/* Hide sidebar */
+.css-1d391kg { display: none; }
 </style>
 """
 st.markdown(BASE_CSS, unsafe_allow_html=True)
-
-if "Dark" in theme_mode:
-    st.markdown("""
-    <script>
-    const el = document.querySelector('[data-testid="stAppViewContainer"]');
-    if (el) { el.classList.add('dark'); }
-    </script>
-    """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hero">
@@ -90,13 +75,16 @@ def to_be(ce): return ce + 543
 try:
     xls = pd.ExcelFile(DATA_PATH)
     df = pd.read_excel(xls, sheet_name=xls.sheet_names[0])
-    st.success(f"📄 โหลดข้อมูลจากไฟล์บนเซิร์ฟเวอร์ • แถว {len(df):,} • คอลัมน์ {len(df.columns)}")
+    success_msg = st.success(f"📄 โหลดข้อมูลจากไฟล์บนเซิร์ฟเวอร์ • แถว {len(df):,} • คอลัมน์ {len(df.columns)}")
+    import time
+    time.sleep(5)
+    success_msg.empty()
 except Exception as e:
     st.error(f"อ่านไฟล์ไม่สำเร็จ: {e}")
     st.stop()
 
 default_cols = {
-    "date": "transaction_date",
+    "date": "contract_date",
     "type": "project_type_name",
     "value": "contract_price_agree",
     "vendor": "winner_name",
