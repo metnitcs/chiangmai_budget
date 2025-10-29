@@ -8,47 +8,46 @@ from pathlib import Path
 
 st.set_page_config(page_title="ระบบติดตามงบประมาณ (สไตล์ Lamphun)", layout="wide")
 
-# THEME
-with st.sidebar:
-    theme_mode = st.radio("ธีมเว็บไซต์", ["ขาว (Light)", "ดำ (Dark)"], index=0)
-
+# BRIGHT THEME
 BASE_CSS = """
 <style>
-:root { --primary: #1f9d55; --accent: #0ea5e9; }
+:root { --primary: #ff6b35; --secondary: #f7931e; --accent: #00d4aa; --purple: #8b5cf6; }
 .block-container { padding-top: 0.5rem; }
 .hero {
-  background: linear-gradient(90deg, var(--primary), #2dd4bf);
-  color: white; padding: 22px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  color: white; padding: 24px; border-radius: 20px; box-shadow: 0 12px 32px rgba(255,107,53,.2);
 }
-.hero h1 { margin: 0; font-size: 1.6rem; }
-.hero p { margin: 6px 0 0; opacity: .95; }
-.kpi { background: #ffffff; border-radius: 16px; padding: 18px; border: 1px solid #f0f0f0; box-shadow: 0 4px 16px rgba(0,0,0,.04); }
-.kpi .label { color: #6b7280; font-size: .9rem; }
-.kpi .value { color: var(--primary); font-weight: 700; font-size: 1.25rem; }
-body.dark, [data-testid="stAppViewContainer"].dark { background: #0f1116; color: #e5e7eb; }
-.dark .hero { background: linear-gradient(90deg, #065f46, #0e7490); }
-.dark .kpi { background: #111827; border-color: #1f2937; }
-.dark .kpi .label { color: #9ca3af; }
-.dark .kpi .value { color: #34d399; }
-.stTabs [data-baseweb="tab-list"] { gap: .25rem; }
-.stTabs [data-baseweb="tab"] { border-radius: 999px; background: rgba(0,0,0,.04); }
-.dark .stTabs [data-baseweb="tab"] { background: rgba(255,255,255,.06); }
+.hero h1 { margin: 0; font-size: 1.8rem; font-weight: 800; }
+.hero p { margin: 8px 0 0; opacity: .95; font-size: 1.05rem; }
+.kpi { 
+  background: linear-gradient(145deg, #ffffff, #f8fafc); 
+  border-radius: 20px; padding: 20px; 
+  border: 2px solid #e0f2fe; 
+  box-shadow: 0 8px 25px rgba(0,212,170,.1);
+  transition: transform 0.2s ease;
+}
+.kpi:hover { transform: translateY(-2px); }
+.kpi .label { color: #475569; font-size: .95rem; font-weight: 600; }
+.kpi .value { color: var(--primary); font-weight: 800; font-size: 1.4rem; }
+.stTabs [data-baseweb="tab-list"] { gap: .5rem; }
+.stTabs [data-baseweb="tab"] { 
+  border-radius: 25px; 
+  background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+  border: 2px solid transparent;
+  font-weight: 600;
+}
+.stTabs [data-baseweb="tab"]:hover { 
+  background: linear-gradient(145deg, var(--accent), var(--purple));
+  color: white;
+}
 </style>
 """
 st.markdown(BASE_CSS, unsafe_allow_html=True)
 
-if "Dark" in theme_mode:
-    st.markdown("""
-    <script>
-    const el = document.querySelector('[data-testid="stAppViewContainer"]');
-    if (el) { el.classList.add('dark'); }
-    </script>
-    """, unsafe_allow_html=True)
-
 st.markdown("""
 <div class="hero">
-  <h1>ระบบติดตามงบประมาณ</h1>
-  <p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส</p>
+  <h1>🎯 ระบบติดตามงบประมาณ</h1>
+  <p>✨ แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส 🌈</p>
 </div>
 """, unsafe_allow_html=True)
 
