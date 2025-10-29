@@ -13,9 +13,14 @@ BASE_CSS = """
 <style>
 :root { --primary: #ff6b35; --secondary: #f7931e; --accent: #00d4aa; --purple: #8b5cf6; }
 
-/* Force light background */
+/* Force light background and dark text */
 .stApp, .main .block-container, [data-testid="stAppViewContainer"] {
   background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+/* All text elements dark */
+.stMarkdown, .stText, p, div, span, label, .stSelectbox label, .stDateInput label {
   color: #1f2937 !important;
 }
 
@@ -24,8 +29,8 @@ BASE_CSS = """
   background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
   color: white; padding: 24px; border-radius: 20px; box-shadow: 0 12px 32px rgba(255,107,53,.2);
 }
-.hero h1 { margin: 0; font-size: 1.8rem; font-weight: 800; }
-.hero p { margin: 8px 0 0; opacity: .95; font-size: 1.05rem; }
+.hero h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: white !important; }
+.hero p { margin: 8px 0 0; opacity: .95; font-size: 1.05rem; color: white !important; }
 
 .kpi { 
   background: linear-gradient(145deg, #ffffff, #f8fafc); 
@@ -35,11 +40,16 @@ BASE_CSS = """
   transition: transform 0.2s ease;
 }
 .kpi:hover { transform: translateY(-2px); }
-.kpi .label { color: #475569; font-size: .95rem; font-weight: 600; }
-.kpi .value { color: var(--primary); font-weight: 800; font-size: 1.4rem; }
+.kpi .label { color: #475569 !important; font-size: .95rem; font-weight: 600; }
+.kpi .value { color: var(--primary) !important; font-weight: 800; font-size: 1.4rem; }
 
-/* Override Streamlit components */
-.stSelectbox > div > div, .stDateInput > div > div {
+/* Streamlit components */
+.stSelectbox > div > div, .stDateInput > div > div, .stSlider > div > div {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+.stSelectbox div[data-baseweb="select"] {
   background-color: #ffffff !important;
   color: #1f2937 !important;
 }
@@ -55,6 +65,11 @@ BASE_CSS = """
 .stTabs [data-baseweb="tab"]:hover { 
   background: linear-gradient(145deg, var(--accent), var(--purple)) !important;
   color: white !important;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+  color: #1f2937 !important;
 }
 </style>
 """
@@ -139,7 +154,7 @@ if df["_date"].notna().sum() == 0:
     st.stop()
 
 # YEAR FIRST → DATE FILTER
-st.markdown("### 📅 เลือกปีงบประมาณ/ปฏิทิน ก่อน แล้วค่อยกรองช่วงวัน")
+st.markdown("<h3 style='color: #1f2937 !important;'>📅 เลือกปีงบประมาณ/ปฏิทิน ก่อน แล้วค่อยกรองช่วงวัน</h3>", unsafe_allow_html=True)
 fy_toggle = st.toggle("ใช้ปีงบประมาณไทย (ต.ค. ปีก่อน → ก.ย. ปีที่เลือก)", value=True)
 
 if fy_toggle:
