@@ -40,9 +40,8 @@ body.dark, [data-testid="stAppViewContainer"].dark {{ background: {DARK_BG}; col
 st.markdown(BASE_CSS, unsafe_allow_html=True)
 if "Dark" in theme_mode:
    st.markdown(
-    '<script>document.querySelector("[data-testid=\\"stAppViewContainer\\"]").classList.add("dark")</script>',
-    unsafe_allow_html=True
-)
+    '<script>document.querySelector("[data-testid=\\"stAppViewContainer\\"]").classList.add("dark")</script>',unsafe_allow_html=True)
+    
 st.markdown('<div class="hero"><h1>ระบบติดตามงบประมาณ</h1><p>แดชบอร์ดสรุปการจัดซื้อจัดจ้าง · เลือกปีงบประมาณ/ปฏิทิน → เลือกช่วงวัน · กราฟสีสันสดใส</p></div>', unsafe_allow_html=True)
 
 DATA_PATH = "/mnt/data/รายการจัดซื้อจัดจ้างองค์การบริหารส่วนจังหวัดเชียงใหม่2558-2568.xlsx"
