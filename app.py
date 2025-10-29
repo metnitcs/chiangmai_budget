@@ -13,15 +13,21 @@ BASE_CSS = """
 <style>
 :root { --primary: #ff6b35; --secondary: #f7931e; --accent: #00d4aa; --purple: #8b5cf6; }
 
-/* Force light background and dark text */
-.stApp, .main .block-container, [data-testid="stAppViewContainer"] {
-  background-color: #ffffff !important;
+/* FORCE EVERYTHING TO BE VISIBLE */
+* {
   color: #1f2937 !important;
 }
 
-/* All text elements dark */
-.stMarkdown, .stText, p, div, span, label, .stSelectbox label, .stDateInput label {
-  color: #1f2937 !important;
+.stApp {
+  background-color: #ffffff !important;
+}
+
+[data-testid="stAppViewContainer"] {
+  background-color: #ffffff !important;
+}
+
+.main .block-container {
+  background-color: #ffffff !important;
 }
 
 .block-container { padding-top: 0.5rem; }
@@ -43,42 +49,6 @@ BASE_CSS = """
 .kpi .label { color: #475569 !important; font-size: .95rem; font-weight: 600; }
 .kpi .value { color: var(--primary) !important; font-weight: 800; font-size: 1.4rem; }
 
-/* Streamlit components */
-.stSelectbox > div > div, .stDateInput > div > div, .stSlider > div > div {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-}
-
-.stSelectbox div[data-baseweb="select"] {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-}
-
-/* Fix selectbox text */
-.stSelectbox div[data-baseweb="select"] > div {
-  color: #1f2937 !important;
-}
-
-/* Fix success/error messages */
-.stAlert > div {
-  color: #1f2937 !important;
-}
-
-.stSuccess > div {
-  background-color: #d1fae5 !important;
-  color: #065f46 !important;
-}
-
-.stError > div {
-  background-color: #fee2e2 !important;
-  color: #991b1b !important;
-}
-
-/* Fix toggle text */
-.stCheckbox > label > div {
-  color: #1f2937 !important;
-}
-
 .stTabs [data-baseweb="tab-list"] { gap: .5rem; }
 .stTabs [data-baseweb="tab"] { 
   border-radius: 25px; 
@@ -90,30 +60,6 @@ BASE_CSS = """
 .stTabs [data-baseweb="tab"]:hover { 
   background: linear-gradient(145deg, var(--accent), var(--purple)) !important;
   color: white !important;
-}
-
-/* Headers */
-h1, h2, h3, h4, h5, h6 {
-  color: #1f2937 !important;
-}
-
-/* Labels and form elements */
-.stSelectbox > label, .stDateInput > label, .stSlider > label {
-  color: #1f2937 !important;
-  font-weight: 600 !important;
-}
-
-/* Dropdown options */
-[data-baseweb="popover"] {
-  background-color: #ffffff !important;
-}
-
-[data-baseweb="menu"] {
-  background-color: #ffffff !important;
-}
-
-[data-baseweb="menu"] li {
-  color: #1f2937 !important;
 }
 </style>
 """
@@ -164,9 +110,9 @@ def to_be(ce): return ce + 543
 try:
     xls = pd.ExcelFile(DATA_PATH)
     df = pd.read_excel(xls, sheet_name=xls.sheet_names[0])
-    st.success(f"📄 โหลดข้อมูลจากไฟล์บนเซิร์ฟเวอร์ • แถว {len(df):,} • คอลัมน์ {len(df.columns)}")
+    st.markdown(f"<div style='background: #d1fae5; color: #065f46; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;'>📄 โหลดข้อมูลจากไฟล์บนเซิร์ฟเวอร์ • แถว {len(df):,} • คอลัมน์ {len(df.columns)}</div>", unsafe_allow_html=True)
 except Exception as e:
-    st.error(f"อ่านไฟล์ไม่สำเร็จ: {e}")
+    st.markdown(f"<div style='background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;'>อ่านไฟล์ไม่สำเร็จ: {e}</div>", unsafe_allow_html=True)
     st.stop()
 
 default_cols = {
@@ -194,7 +140,7 @@ df["_money"] = df[money_col].apply(clean_num)
 df["_year_ce"] = df["_date"].dt.year
 df["_month"] = df["_date"].dt.month
 if df["_date"].notna().sum() == 0:
-    st.error("ไม่พบวันที่ที่ parse ได้จากคอลัมน์ที่เลือก")
+    st.markdown("<div style='background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;'>ไม่พบวันที่ที่ parse ได้จากคอลัมน์ที่เลือก</div>", unsafe_allow_html=True)
     st.stop()
 
 # YEAR FIRST → DATE FILTER
