@@ -52,7 +52,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # HELPERS
-DATA_PATH = "/mnt/data/data.xlsx"
+DATA_PATH = Path(__file__).with_name("data.xlsx")
 TH_MONTHS = {
     "ม.ค.":1,"ก.พ.":2,"มี.ค.":3,"เม.ย.":4,"พ.ค.":5,"มิ.ย.":6,
     "ก.ค.":7,"ส.ค.":8,"ก.ย.":9,"ต.ค.":10,"พ.ย.":11,"ธ.ค.":12,
